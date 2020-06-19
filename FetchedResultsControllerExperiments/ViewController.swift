@@ -167,6 +167,7 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
 
     }
 
+    private var reloadRows = false
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         guard legacyMode else { return }
         switch (type) {
@@ -181,8 +182,9 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
                 print("delete: \(actIndexPath.row)")
             }
         case NSFetchedResultsChangeType.update:
+            reloadRows = true
             if let actIndexPath = indexPath {
-                tableView.reloadRows(at: [actIndexPath], with: .fade)
+                //tableView.reloadRows(at: [actIndexPath], with: .fade)
                 print("update: \(actIndexPath.row)")
             }
         case NSFetchedResultsChangeType.move:
@@ -199,6 +201,10 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
         guard legacyMode else { return }
         print("end")
         tableView.endUpdates()
+        if reloadRows {
+            tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [], with: .automatic)
+            reloadRows = false
+        }
     }
 
 }
