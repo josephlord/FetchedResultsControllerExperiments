@@ -63,7 +63,7 @@ class ViewController: UIViewController {
             context.parent = mainContext
             do {
                 let objects = try context.fetch(fetchRequest)
-                zip(objects, [2,1,3]).forEach { entity, newIndex in
+                zip(objects, [2,3,1]).forEach { entity, newIndex in
                     entity.order = newIndex
                 }
                 try context.save()
@@ -101,6 +101,7 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
 
     let controller: NSFetchedResultsController<Entity>
     let tableView: UITableView
+    private var reloadIndexPaths: [IndexPath] = []
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return controller.fetchedObjects!.count
@@ -142,7 +143,7 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
             }
         case NSFetchedResultsChangeType.update:
             if let actIndexPath = indexPath {
-                tableView.reloadRows(at: [actIndexPath], with: .fade)
+                reloadIndexPaths.append(actIndexPath)
                 print("update: \(actIndexPath.row)")
             }
         case NSFetchedResultsChangeType.move:
@@ -158,6 +159,8 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("end")
         tableView.endUpdates()
+        tableView.reloadRows(at: reloadIndexPaths, with: .fade)
+        reloadIndexPaths = []
     }
 
 }
