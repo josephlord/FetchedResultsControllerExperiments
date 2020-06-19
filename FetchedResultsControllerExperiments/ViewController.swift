@@ -143,6 +143,7 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
             }
         case NSFetchedResultsChangeType.update:
             if let actIndexPath = indexPath {
+//                tableView.reloadRows(at: [actIndexPath], with: .fade)
                 reloadIndexPaths.append(actIndexPath)
                 print("update: \(actIndexPath.row)")
             }
@@ -159,8 +160,9 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("end")
         tableView.endUpdates()
-        tableView.reloadRows(at: reloadIndexPaths, with: .fade)
-        reloadIndexPaths = []
+        tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [], with: .fade)
+//        tableView.reloadRows(at: reloadIndexPaths, with: .fade)
+//        reloadIndexPaths = []
     }
 
 }
