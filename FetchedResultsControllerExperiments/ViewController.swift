@@ -35,6 +35,11 @@ class ViewController: UIViewController {
         ])
         button.addTarget(self, action: #selector(shuffleItems), for: .primaryActionTriggered)
         deleteAll()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        datasource.load()
         createItems()
     }
 
@@ -72,7 +77,6 @@ class ViewController: UIViewController {
             }
         }
     }
-
     let backgroundQueue = DispatchQueue(label: "background")
 }
 
@@ -83,8 +87,16 @@ let fetchRequest: NSFetchRequest<Entity> = {
     return fetchRequest
 }()
 
-class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDelegate {
+class Datasource : NSObject, NSFetchedResultsControllerDelegate {
 
+    lazy var diffableDataSource = UITableViewDiffableDataSource<String, NSManagedObjectID>(
+        tableView: tableView,
+        cellProvider: { [weak self] tableView, indexPath, id in
+            guard let entity = self?.controller.object(at: indexPath) else { return UITableViewCell() }
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            cell.textLabel?.text = "\(entity.order) \(entity.label!)"
+            return cell
+    })
     init(tableView: UITableView) {
         controller = NSFetchedResultsController(
             fetchRequest: fetchRequest,
@@ -94,9 +106,11 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
         self.tableView = tableView
         super.init()
         controller.delegate = self
-        try! controller.performFetch()
-        tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+    }
+    func load() {
+        try! controller.performFetch()
+        tableView.dataSource = diffableDataSource
     }
 
     let controller: NSFetchedResultsController<Entity>
@@ -113,52 +127,56 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
         return cell
     }
 
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.beginUpdates()
-        print("begin")
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
+        self.diffableDataSource.apply(snapshot as NSDiffableDataSourceSnapshot<String, NSManagedObjectID>)
     }
 
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, sectionIndexTitleForSectionName sectionName: String) -> String? {
-        assertionFailure()
-        return sectionName
-    }
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        assertionFailure(sectionInfo.indexTitle!.description)
-
-    }
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch (type) {
-        case NSFetchedResultsChangeType.insert:
-            if let actNewIndexPath = newIndexPath {
-                tableView.insertRows(at: [actNewIndexPath], with: .automatic)
-                print("insert: \(actNewIndexPath.row)")
-            }
-        case NSFetchedResultsChangeType.delete:
-            if let actIndexPath = indexPath {
-                tableView.deleteRows(at: [actIndexPath], with: .fade)
-                print("delete: \(actIndexPath.row)")
-            }
-        case NSFetchedResultsChangeType.update:
-            if let actIndexPath = indexPath {
-                tableView.reloadRows(at: [actIndexPath], with: .fade)
-                print("update: \(actIndexPath.row)")
-            }
-        case NSFetchedResultsChangeType.move:
-            if let indexPath = indexPath, let newIndexPath = newIndexPath {
-                tableView.moveRow(at: indexPath, to: newIndexPath)
-                print("move: \(indexPath.row) -> \(newIndexPath.row)")
-            } else { assertionFailure() }
-        @unknown default:
-            assertionFailure()
-        }
-    }
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("end")
-        tableView.endUpdates()
-    }
+//    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+//        tableView.beginUpdates()
+//        print("begin")
+//    }
+//
+//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, sectionIndexTitleForSectionName sectionName: String) -> String? {
+//        assertionFailure()
+//        return sectionName
+//    }
+//
+//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+//        assertionFailure(sectionInfo.indexTitle!.description)
+//
+//    }
+//
+//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+//        switch (type) {
+//        case NSFetchedResultsChangeType.insert:
+//            if let actNewIndexPath = newIndexPath {
+//                tableView.insertRows(at: [actNewIndexPath], with: .automatic)
+//                print("insert: \(actNewIndexPath.row)")
+//            }
+//        case NSFetchedResultsChangeType.delete:
+//            if let actIndexPath = indexPath {
+//                tableView.deleteRows(at: [actIndexPath], with: .fade)
+//                print("delete: \(actIndexPath.row)")
+//            }
+//        case NSFetchedResultsChangeType.update:
+//            if let actIndexPath = indexPath {
+//                tableView.reloadRows(at: [actIndexPath], with: .fade)
+//                print("update: \(actIndexPath.row)")
+//            }
+//        case NSFetchedResultsChangeType.move:
+//            if let indexPath = indexPath, let newIndexPath = newIndexPath {
+//                tableView.moveRow(at: indexPath, to: newIndexPath)
+//                print("move: \(indexPath.row) -> \(newIndexPath.row)")
+//            } else { assertionFailure() }
+//        @unknown default:
+//            assertionFailure()
+//        }
+//    }
+//
+//    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+//        print("end")
+//        tableView.endUpdates()
+//    }
 
 }
 
