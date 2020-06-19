@@ -34,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     // MARK: - Core Data stack
+    static let persistentContainer = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
 
     lazy var persistentContainer: NSPersistentContainer = {
         /*
