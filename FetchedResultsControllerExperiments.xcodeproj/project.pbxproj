@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		C362C4F2249B541E00105811 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C362C4F1249B541E00105811 /* AppDelegate.swift */; };
-		C362C4F4249B541E00105811 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C362C4F3249B541E00105811 /* SceneDelegate.swift */; };
 		C362C4F6249B541E00105811 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C362C4F5249B541E00105811 /* ViewController.swift */; };
 		C362C4F9249B541E00105811 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C362C4F7249B541E00105811 /* Main.storyboard */; };
 		C362C4FC249B541F00105811 /* FetchedResultsControllerExperiments.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C362C4FA249B541F00105811 /* FetchedResultsControllerExperiments.xcdatamodeld */; };
@@ -16,6 +15,7 @@
 		C362C501249B542200105811 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C362C4FF249B542200105811 /* LaunchScreen.storyboard */; };
 		C362C50C249B542200105811 /* FetchedResultsControllerExperimentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C362C50B249B542200105811 /* FetchedResultsControllerExperimentsTests.swift */; };
 		C362C517249B542200105811 /* FetchedResultsControllerExperimentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C362C516249B542200105811 /* FetchedResultsControllerExperimentsUITests.swift */; };
+		C3BEA009249C4D5A00E49078 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C362C4F3249B541E00105811 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -267,7 +267,7 @@
 				C362C4F6249B541E00105811 /* ViewController.swift in Sources */,
 				C362C4FC249B541F00105811 /* FetchedResultsControllerExperiments.xcdatamodeld in Sources */,
 				C362C4F2249B541E00105811 /* AppDelegate.swift in Sources */,
-				C362C4F4249B541E00105811 /* SceneDelegate.swift in Sources */,
+				C3BEA009249C4D5A00E49078 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,6 +444,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G4MJEEPY93;
 				INFOPLIST_FILE = FetchedResultsControllerExperiments/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -464,6 +465,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G4MJEEPY93;
 				INFOPLIST_FILE = FetchedResultsControllerExperiments/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
