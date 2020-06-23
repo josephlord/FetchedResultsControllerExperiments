@@ -68,8 +68,10 @@ class ViewController: UIViewController {
             context.parent = mainContext
             do {
                 let objects = try context.fetch(fetchRequest)
-                zip(objects, [2,1,3]).forEach { entity, newIndex in
-                    entity.order = newIndex
+                if Bool.random() {
+                    zip(objects, [2,1,3]).forEach { entity, newIndex in
+                        entity.order = newIndex
+                    }
                 }
                 objects[2].label = Int64.random(in: 0 ... .max).description
                 try context.save()
