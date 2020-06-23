@@ -63,9 +63,13 @@ class ViewController: UIViewController {
             context.parent = mainContext
             do {
                 let objects = try context.fetch(fetchRequest)
-                zip(objects, [2,1,3]).forEach { entity, newIndex in
-                    entity.order = newIndex
+                if Bool.random() {
+
+                    zip(objects, [2,1,3]).forEach { entity, newIndex in
+                        entity.order = newIndex
+                    }
                 }
+                objects[2].label = Int.random(in: 0 ..< Int.max).description
                 try context.save()
             } catch {
                 assertionFailure(error.localizedDescription)
@@ -113,10 +117,7 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
         return cell
     }
 
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.beginUpdates()
-        print("begin")
-    }
+
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, sectionIndexTitleForSectionName sectionName: String) -> String? {
         assertionFailure()
@@ -126,6 +127,13 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         assertionFailure(sectionInfo.indexTitle!.description)
 
+    }
+    var indexPaths: [IndexPath] = []
+
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.beginUpdates()
+        print("begin")
+        indexPaths = []
     }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -141,13 +149,15 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
                 print("delete: \(actIndexPath.row)")
             }
         case NSFetchedResultsChangeType.update:
-            if let actIndexPath = indexPath {
-                tableView.reloadRows(at: [actIndexPath], with: .fade)
+            if let actIndexPath = newIndexPath {
+//                tableView.reloadRows(at: [actIndexPath], with: .fade)
+                indexPaths.append(actIndexPath)
                 print("update: \(actIndexPath.row)")
             }
         case NSFetchedResultsChangeType.move:
             if let indexPath = indexPath, let newIndexPath = newIndexPath {
                 tableView.moveRow(at: indexPath, to: newIndexPath)
+                indexPaths.append(newIndexPath)
                 print("move: \(indexPath.row) -> \(newIndexPath.row)")
             } else { assertionFailure() }
         @unknown default:
@@ -157,7 +167,10 @@ class Datasource : NSObject, UITableViewDataSource, NSFetchedResultsControllerDe
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("end")
+//        tableView.reloadRows(at: indexPaths, with: .none)
+
         tableView.endUpdates()
+        tableView.reloadRows(at: indexPaths, with: .automatic)
     }
 
 }
