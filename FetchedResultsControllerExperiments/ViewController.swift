@@ -71,6 +71,7 @@ class ViewController: UIViewController {
                 zip(objects, [2,1,3]).forEach { entity, newIndex in
                     entity.order = newIndex
                 }
+                objects[2].label = Int64.random(in: 0 ... .max).description
                 try context.save()
             } catch {
                 assertionFailure(error.localizedDescription)
@@ -100,6 +101,7 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
     })
 
     let legacyMode: Bool = {
+        return true
         if #available(iOS 13.0, *) {
             return false
         } else {
@@ -121,7 +123,8 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
     }
     func load() {
         try! controller.performFetch()
-        if #available(iOS 13.0, *) {
+        if !legacyMode,
+            #available(iOS 13.0, *) {
             tableView.dataSource = diffableDataSource
         } else {
             tableView.dataSource = self
@@ -144,10 +147,39 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
         return cell
     }
 
-    @available(iOS 13.0, *)
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
-        self.diffableDataSource.apply(snapshot as NSDiffableDataSourceSnapshot<String, NSManagedObjectID>)
+    @available(iOS 13, *)
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                    didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
+        print(diff)
+        tableView.performBatchUpdates({
+            var moves: [(IndexPath, IndexPath)] = []
+            var inserts: [IndexPath] = []
+            var deletes: [IndexPath] = []
+            for update in diff{
+                switch update {
+                case .remove(offset: let offset, element: _, associatedWith: nil):
+                    deletes.append(IndexPath(row: offset, section: 0))
+                case .remove(offset: let offset, element: _, associatedWith: let move?):
+                    moves.append((IndexPath(row: offset, section: 0), IndexPath(row: move, section: 0)))
+                case .insert(offset: let offset, element: _, nil):
+                    inserts.append(IndexPath(row: offset, section: 0))
+                case .insert:
+                    break // Covered by the remove case
+                }
+            }
+            moves.forEach { tableView.moveRow(at: $0.0, to: $0.1) }
+            tableView.deleteRows(at: deletes, with: .left)
+            tableView.insertRows(at: inserts, with: .right)
+        }) { complete in
+            self.tableView.reloadRows(at: self.tableView.indexPathsForVisibleRows ?? [], with: .none)
+        }
     }
+
+//    @available(iOS 13.0, *)
+//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
+//
+//        self.diffableDataSource.apply(snapshot as NSDiffableDataSourceSnapshot<String, NSManagedObjectID>)
+//    }
 
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard legacyMode else { return }
@@ -206,6 +238,5 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate, UITableViewData
             reloadRows = false
         }
     }
-
 }
 
