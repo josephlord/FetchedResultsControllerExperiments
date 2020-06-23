@@ -13,27 +13,11 @@ class ViewController: UIViewController {
 
     let button = UIButton(type: .infoDark)
     let datasource = Datasource(tableView: UITableView())
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        let tableView = datasource.tableView
-        self.view.translatesAutoresizingMaskIntoConstraints = false
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        button.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-        view.addConstraints([
-            NSLayoutConstraint(item: tableView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: tableView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: tableView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: tableView, attribute: .height, relatedBy: .equal, toItem: view, attribute: .height, multiplier: 0.7, constant: 0),
-        ])
-        view.addSubview(button)
-        view.addConstraints([
-            NSLayoutConstraint(item: button, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: button, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: button, attribute: .top, relatedBy: .equal, toItem: tableView, attribute: .bottom, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: button, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
-        ])
-        button.addTarget(self, action: #selector(shuffleItems), for: .primaryActionTriggered)
+        createViews()
         deleteAll()
     }
 
@@ -81,6 +65,28 @@ class ViewController: UIViewController {
         }
     }
     let backgroundQueue = DispatchQueue(label: "background")
+
+    fileprivate func createViews() {
+        let tableView = datasource.tableView
+        self.view.translatesAutoresizingMaskIntoConstraints = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        button.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        view.addConstraints([
+            NSLayoutConstraint(item: tableView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: tableView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: tableView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: tableView, attribute: .height, relatedBy: .equal, toItem: view, attribute: .height, multiplier: 0.7, constant: 0),
+        ])
+        view.addSubview(button)
+        view.addConstraints([
+            NSLayoutConstraint(item: button, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: button, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: button, attribute: .top, relatedBy: .equal, toItem: tableView, attribute: .bottom, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: button, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
+        ])
+        button.addTarget(self, action: #selector(shuffleItems), for: .primaryActionTriggered)
+    }
 }
 
 let mainContext = AppDelegate.persistentContainer.viewContext
@@ -138,6 +144,8 @@ class Datasource : NSObject, NSFetchedResultsControllerDelegate {
                 self.tableView.reloadData()
             }
     }
+
+
 
 //    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 //        tableView.beginUpdates()
